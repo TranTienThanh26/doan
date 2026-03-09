@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn hàng | Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/admin_sidebar :: admin-sidebar(currentPage='orders')}"></div>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <div>
+                <a href="/admin/don-hang"
+                    style="display: flex; align-items: center; gap: 8px; color: var(--admin-text-light); text-decoration: none; margin-bottom: 10px; font-size: 14px;">
+                    <span>←</span> Quay lại danh sách
+                </a>
+                <h1 class="admin-title" th:text="'Chi tiết đơn hàng #' + ${dh.id}">Chi tiết đơn hàng</h1>
+            </div>
+
+            <!-- Status Actions -->
+            <div style="display: flex; gap: 10px;">
+                <form th:if="${dh.trangThai == 'Chờ xác nhận' || dh.trangThai == 'Chờ xử lý'}"
+                    th:action="@{/admin/don-hang/update-status}" method="post">
+                    <input type="hidden" name="id" th:value="${dh.id}">
+                    <input type="hidden" name="trangThai" value="Đã xác nhận">
+                    <button type="submit" class="btn-admin" style="background: var(--admin-success); color: white;">✔
+                        Duyệt đơn</button>
+                </form>
+                <form th:if="${dh.trangThai == 'Chờ xác nhận' || dh.trangThai == 'Chờ xử lý'}"
+                    th:action="@{/admin/don-hang/update-status}" method="post">
+                    <input type="hidden" name="id" th:value="${dh.id}">
+                    <input type="hidden" name="trangThai" value="Đã hủy">
+                    <button type="submit" class="btn-admin" style="background: var(--admin-danger); color: white;">✖ Hủy
+                        đơn</button>
+                </form>
+                <button onclick="window.print()" class="btn-admin btn-admin-outline">🖨️ In hóa đơn</button>
+            </div>
+        </header>
+
+        <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+
+            <!-- Product List -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3 class="card-title">Sản phẩm đã chọn</h3>
+                    <span
+                        th:class="'badge ' + ${dh.trangThai == 'Đã xác nhận' ? 'badge-success' : (dh.trangThai == 'Đã hủy' ? 'badge-danger' : 'badge-pending')}"
+                        th:text="${dh.trangThai}"></span>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Số lượng</th>
+                            <th style="text-align: right;">Tổng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${items}">
+                            <td style="display: flex; gap: 15px; align-items: center;">
+                                <th:block th:if="${item.sanPham != null}">
+                                    <img th:src="@{'/images/' + ${item.sanPham.hinhAnh}}"
+                                        onerror="this.src='/images/default-product.jpg'"
+                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--admin-border);">
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--admin-dark);"
+                                            th:text="${item.sanPham.ten}"></div>
+                                        <div style="font-size: 12px; color: var(--admin-text-light);"
+                                            th:text="${item.size} + ' | ' + ${item.mau}"></div>
+                                    </div>
+                                </th:block>
+                                <th:block th:unless="${item.sanPham != null}">
+                                    <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=800"
+                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--admin-border);">
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--admin-text-light);">Sản phẩm đã bị
+                                            xóa</div>
+                                        <div style="font-size: 12px; color: var(--admin-text-light);"
+                                            th:text="${item.size} + ' | ' + ${item.mau}"></div>
+                                    </div>
+                                </th:block>
+                            </td>
+                            <td th:text="${#numbers.formatDecimal(item.donGia, 0, 'COMMA', 0, 'POINT') + ' đ'}"></td>
+                            <td th:text="'x' + ${item.soLuong}"></td>
+                            <td style="text-align: right; font-weight: 600;"
+                                th:text="${#numbers.formatDecimal(item.donGia * item.soLuong, 0, 'COMMA', 0, 'POINT') + ' đ'}">
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr style="background: #fcfcfd;">
+                            <td colspan="3"
+                                style="text-align: right; font-weight: 600; color: var(--admin-text-light);">Tổng tiền
+                                hàng:</td>
+                            <td style="text-align: right; font-weight: 700; color: var(--admin-primary); font-size: 16px;"
+                                th:text="${#numbers.formatDecimal(dh.tongTien, 0, 'COMMA', 0, 'POINT') + ' đ'}"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Customer Info -->
+            <div style="display: flex; flex-direction: column; gap: 30px;">
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Thông tin khách hàng</h3>
+                    </div>
+                    <div style="padding: 20px;">
+                        <div style="margin-bottom: 15px;">
+                            <div
+                                style="font-size: 12px; color: var(--admin-text-light); text-transform: uppercase; font-weight: 600;">
+                                Họ và tên</div>
+                            <div style="font-weight: 500; font-size: 15px;" th:text="${dh.tenNhan}"></div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <div
+                                style="font-size: 12px; color: var(--admin-text-light); text-transform: uppercase; font-weight: 600;">
+                                Số điện thoại</div>
+                            <div style="font-family: monospace; font-size: 15px;" th:text="${dh.sdt}"></div>
+                        </div>
+                        <div>
+                            <div
+                                style="font-size: 12px; color: var(--admin-text-light); text-transform: uppercase; font-weight: 600;">
+                                Địa chỉ giao hàng</div>
+                            <div style="line-height: 1.5;" th:text="${dh.diaChi}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Ghi chú</h3>
+                    </div>
+                    <div style="padding: 20px; color: var(--admin-text-light); font-style: italic;">
+                        <span
+                            th:text="${dh.ghiChu != null && !dh.ghiChu.isEmpty() ? dh.ghiChu : 'Không có ghi chú từ khách hàng.'}"></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+
+</html>

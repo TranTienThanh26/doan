@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập | Clothing Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo">👕 CLOTHING SHOP</div>
+            <h2>Chào mừng trở lại</h2>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 30px;">Vui lòng đăng nhập để tiếp
+                tục</p>
+        </div>
+
+        <form action="/dang-nhap" method="post">
+            <div class="form-group">
+                <label for="tenDangNhap">Tên đăng nhập</label>
+                <input type="text" id="tenDangNhap" name="tenDangNhap" class="form-control"
+                    placeholder="Nhập tên đăng nhập" required>
+            </div>
+
+            <div class="form-group">
+                <label for="matKhau">Mật khẩu</label>
+                <input type="password" id="matKhau" name="matKhau" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <div class="form-group">
+                <label for="vaiTro">Bạn là ai?</label>
+                <select name="vaiTro" id="vaiTro" class="form-control" required style="cursor: pointer;">
+                    <option value="" disabled selected>-- Chọn vai trò --</option>
+                    <option value="ADMIN">Quản trị viên</option>
+                    <option value="KHACHHANG">Khách hàng</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Đăng nhập</button>
+        </form>
+
+        <div th:if="${error}" class="error"
+            style="color: var(--accent-color); margin-top: 20px; font-size: 14px; background: rgba(255, 71, 87, 0.1); padding: 10px; border-radius: 8px;">
+            <span th:text="${error}"></span>
+        </div>
+
+        <div
+            style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px; font-size: 13px; color: var(--text-secondary);">
+            Chưa có tài khoản? <a href="/dang-ky" style="color: var(--primary-color); font-weight: 600;">Đăng ký
+                ngay</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

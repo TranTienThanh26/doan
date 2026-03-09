@@ -1,0 +1,25 @@
+# Maven
+**/target/
+*.class
+
+# IDE
+**/.idea/
+**/.vscode/
+*.iml
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spring Boot
+**/.mvn/
+mvnw
+mvnw.cmd
+
+# Sensitive Data (Security Policy)
+**/application.properties
+**/ootd_params.json
+**/test_HF.py
+**/.env

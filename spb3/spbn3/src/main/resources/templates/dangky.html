@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký tài khoản | Clothing Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo">👕 CLOTHING SHOP</div>
+            <h2>Đăng ký thành viên</h2>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 30px;">Tạo tài khoản để mua sắm ngay
+            </p>
+        </div>
+
+        <form action="/dang-ky" method="post">
+            <div class="form-group">
+                <label for="tenKhachHang">Họ và tên</label>
+                <input type="text" id="tenKhachHang" name="tenKhachHang" class="form-control" placeholder="Nguyễn Văn A"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="tenDangNhap">Tên đăng nhập</label>
+                <input type="text" id="tenDangNhap" name="tenDangNhap" class="form-control" placeholder="username"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="matKhau">Mật khẩu</label>
+                <input type="password" id="matKhau" name="matKhau" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <div class="form-group">
+                <label for="soDienThoai">Số điện thoại</label>
+                <input type="tel" id="soDienThoai" name="soDienThoai" class="form-control" placeholder="0901234567"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="diaChi">Địa chỉ</label>
+                <input type="text" id="diaChi" name="diaChi" class="form-control" placeholder="Số 1, Đường ABC, TP.HCM"
+                    required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Đăng ký</button>
+        </form>
+
+        <div
+            style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px; font-size: 13px; color: var(--text-secondary);">
+            Đã có tài khoản? <a href="/dang-nhap" style="color: var(--primary-color); font-weight: 600;">Đăng nhập
+                ngay</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

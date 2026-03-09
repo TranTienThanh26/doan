@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin | Clothing Shop</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/admin_sidebar :: admin-sidebar(currentPage='dashboard')}"></div>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <div>
+                <h1 class="admin-title">Dashboard Tổng Quan</h1>
+                <div class="admin-subtitle">Chào mừng Admin trở lại, đây là hoạt động hôm nay.</div>
+            </div>
+            <div style="font-size: 14px; font-weight: 500; color: var(--admin-text);">
+                Hôm nay: <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy')}"></span>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h4>Doanh Thu</h4>
+                    <div class="value" th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT') + ' đ'}">
+                        0 đ</div>
+                </div>
+                <div class="stat-icon icon-blue">💰</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h4>Đơn Hàng</h4>
+                    <div class="value" th:text="${totalOrders}">0</div>
+                </div>
+                <div class="stat-icon icon-green">🧾</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h4>Sản Phẩm</h4>
+                    <div class="value" th:text="${totalProducts}">0</div>
+                </div>
+                <div class="stat-icon icon-orange">📦</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h4>Chờ Xử Lý</h4>
+                    <div class="value" th:text="${pendingOrders}" style="color: var(--admin-danger);">0</div>
+                </div>
+                <div class="stat-icon icon-red">🔔</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid: Chart & Latest Orders -->
+        <div class="dashboard-grid">
+
+            <!-- Chart Section -->
+            <div class="chart-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 class="card-title">Biểu Đồ Doanh Thu (7 Ngày)</h3>
+                </div>
+                <canvas id="revenueChart"></canvas>
+            </div>
+
+            <!-- Latest Orders Table -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3 class="card-title">Đơn Hàng Mới</h3>
+                    <a href="/admin/don-hang" class="btn-admin btn-admin-outline">Xem tất cả</a>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Mã</th>
+                            <th>Khách</th>
+                            <th>Tổng</th>
+                            <th>Trạng Thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="dh : ${latestOrders}">
+                            <td th:text="'#' + ${dh.id}" style="font-weight: 600;"></td>
+                            <td th:text="${dh.tenNhan}"></td>
+                            <td th:text="${#numbers.formatDecimal(dh.tongTien, 0, 'COMMA', 0, 'POINT')}"
+                                style="font-weight: 600;"></td>
+                            <td>
+                                <span
+                                    th:class="'badge ' + ${dh.trangThai == 'Đã xác nhận' ? 'badge-success' : (dh.trangThai == 'Đã hủy' ? 'badge-danger' : 'badge-pending')}"
+                                    th:text="${dh.trangThai}"></span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(latestOrders)}">
+                            <td colspan="4" style="text-align: center; padding: 30px; color: #999;">Chưa có đơn hàng
+                                mới.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const labels = /*[[${chartLabels}]]*/[];
+        const data = /*[[${chartData}]]*/[];
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu (VNĐ)',
+                    data: data,
+                    borderColor: '#4361ee',
+                    backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#4361ee',
+                    pointBorderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f0f0f0'
+                        },
+                        ticks: {
+                            callback: function (value) {
+                                return value.toLocaleString('vi-VN') + ' đ';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+        /*]]>*/
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản phẩm | Clothing Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .filter-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container section-padding" style="padding-top: 40px;">
+
+        <!-- Hero Header -->
+        <div style="text-align: center; margin-bottom: 60px;">
+            <h1 style="font-size: 48px; margin-bottom: 10px;">Bộ Sưu Tập Mới</h1>
+            <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Khám phá những xu hướng thời
+                trang mới nhất, được thiết kế để mang lại sự thoải mái và phong cách tối đa.</p>
+        </div>
+
+        <!-- FILTER SECTION -->
+        <form class="filter-section" method="get">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label style="margin-bottom: 5px; display: block; font-size: 13px; color: var(--text-secondary);">Tìm
+                    kiếm</label>
+                <input type="text" name="ten" class="form-control" placeholder="Tên sản phẩm..." th:value="${ten}">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label style="margin-bottom: 5px; display: block; font-size: 13px; color: var(--text-secondary);">Danh
+                    mục</label>
+                <select name="loai" class="form-control">
+                    <option value="">Tất cả danh mục</option>
+                    <option th:selected="${loai == 'Áo'}">Áo</option>
+                    <option th:selected="${loai == 'Quần'}">Quần</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label style="margin-bottom: 5px; display: block; font-size: 13px; color: var(--text-secondary);">Sắp
+                    xếp theo giá</label>
+                <select name="gia" class="form-control">
+                    <option value="">Mặc định</option>
+                    <option>Dưới 200.000</option>
+                    <option>200.000 - 500.000</option>
+                    <option>Trên 500.000</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Lọc kết quả</button>
+        </form>
+
+        <!-- PRODUCT LIST -->
+        <div class="product-grid" th:if="${dsSanPham != null and !dsSanPham.isEmpty()}">
+            <div class="product-card" th:each="sp : ${dsSanPham}">
+                <a th:href="@{/khach-hang/san-pham/{id}(id=${sp.id})}" style="position: relative; display: block;">
+                    <img th:src="@{'/images/' + ${sp.hinhAnh}}" class="product-image"
+                        onerror="this.src='https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=800'">
+                    <div class="product-badge" th:if="${sp.soLuong > 0}">New</div>
+                </a>
+
+                <div class="product-info">
+                    <div class="product-category" th:text="${sp.loai}">Category</div>
+                    <h3 class="product-title">
+                        <a th:href="@{/khach-hang/san-pham/{id}(id=${sp.id})}" th:text="${sp.ten}">Product Name</a>
+                    </h3>
+                    <div class="product-price"
+                        th:text="${#numbers.formatDecimal(sp.gia, 0, 'COMMA', 0, 'POINT') + ' đ'}">0 đ</div>
+
+                    <button class="btn btn-outline"
+                        style="width: 100%; margin: 10px 0; font-size: 13px; border-color: var(--accent-color); color: var(--accent-color);"
+                        th:data-ten="${sp.ten}" th:data-hinh-anh="'/images/' + ${sp.hinhAnh}" th:data-loai="${sp.loai}"
+                        onclick="handleOpenFitting(this)">
+                        <i class="fas fa-magic"></i> Thử đồ thông minh (AI)
+                    </button>
+
+                    <div class="product-meta">
+                        <div class="rating-stars">
+                            ★★★★★
+                        </div>
+                        <div class="sold-count">
+                            100+ đã bán
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div style="text-align: center; padding: 100px 0;" th:if="${dsSanPham == null or dsSanPham.isEmpty()}">
+            <div style="font-size: 64px; margin-bottom: 20px;">🔍</div>
+            <h3 style="font-size: 24px; margin-bottom: 10px;">Không tìm thấy sản phẩm nào</h3>
+            <p style="color: var(--text-secondary);">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm của bạn.</p>
+            <a href="/khach-hang/san-pham" class="btn btn-primary" style="margin-top: 20px;">Xem tất cả</a>
+        </div>
+
+        <!-- PAGINATION (Optional but styled) -->
+        <div style="display: flex; justify-content: center; margin-top: 60px; gap: 10px;"
+            th:if="${dsSanPham != null and !dsSanPham.isEmpty()}">
+            <a href="#" class="btn" style="border: 1px solid var(--border-color);">1</a>
+            <a href="#" class="btn" style="border: 1px solid var(--border-color);">2</a>
+            <a href="#" class="btn" style="border: 1px solid var(--border-color);">Next</a>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/fitting-modal :: fitting-modal}"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- MediaPipe Pose Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+    <!-- Gradio API Client for Free HQ Try-On -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js"></script>
+
+    <script type="module" src="/js/fitting-room.js"></script>
+
+</body>
+
+</html>

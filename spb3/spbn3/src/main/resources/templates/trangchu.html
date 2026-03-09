@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin | Clothing Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+
+        .admin-main {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/admin_sidebar :: admin-sidebar(currentPage='dashboard')}"></div>
+
+    <main class="admin-main">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <div>
+                <h1 style="font-size: 28px; margin-bottom: 5px;">Chào mừng Admin,</h1>
+                <p style="color: var(--text-secondary);">Dưới đây là tóm tắt hoạt động của cửa hàng hôm nay.</p>
+            </div>
+            <div class="user-profile" style="display: flex; align-items: center; gap: 15px;">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600;">System Administrator</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">Lvl 99 Mod</div>
+                </div>
+                <div
+                    style="width: 45px; height: 45px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                    AD</div>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(52, 152, 219, 0.1); color: #3498db;">📦</div>
+                <div>
+                    <div style="font-size: 14px; color: var(--text-secondary);">Sản phẩm</div>
+                    <div style="font-size: 24px; font-weight: 700;">124</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(46, 213, 115, 0.1); color: #2ed573;">🧾</div>
+                <div>
+                    <div style="font-size: 14px; color: var(--text-secondary);">Đơn hàng mới</div>
+                    <div style="font-size: 24px; font-weight: 700;">18</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(255, 71, 87, 0.1); color: #ff4757;">👥</div>
+                <div>
+                    <div style="font-size: 14px; color: var(--text-secondary);">Khách hàng</div>
+                    <div style="font-size: 24px; font-weight: 700;">452</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(255, 176, 0, 0.1); color: #ffa502;">💰</div>
+                <div>
+                    <div style="font-size: 14px; color: var(--text-secondary);">Doanh thu</div>
+                    <div style="font-size: 24px; font-weight: 700;">12.5M</div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            style="margin-top: 40px; background: white; padding: 40px; border-radius: 15px; box-shadow: var(--shadow-sm); text-align: center;">
+            <img src="https://cdni.iconscout.com/illustration/premium/thumb/dashboard-analytics-2735703-2280735.png"
+                style="max-width: 300px; margin-bottom: 20px;">
+            <h3>Khởi đầu một ngày làm việc tuyệt vời!</h3>
+            <p style="color: var(--text-secondary); max-width: 500px; margin: 10px auto;">Hãy kiểm tra các đơn hàng mới
+                nhất hoặc cập nhật danh mục sản phẩm của bạn.</p>
+            <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+                <a href="/san-pham" class="btn btn-primary" style="padding: 12px 25px;">Quản lý sản phẩm</a>
+                <a href="/don-hang" class="btn" style="padding: 12px 25px; border: 1px solid var(--border-color);">Xem
+                    đơn hàng</a>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>

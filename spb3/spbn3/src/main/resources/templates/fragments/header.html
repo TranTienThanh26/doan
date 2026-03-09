@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <header th:fragment="header" class="header">
+        <div class="container">
+            <a href="/khach-hang/san-pham" class="logo">👕 CLOTHING SHOP</a>
+
+            <nav class="nav-links">
+                <a href="/khach-hang/san-pham" class="nav-link">Cửa hàng</a>
+                <a href="/khach-hang/gio-hang" class="nav-link">Giỏ hàng</a>
+                <a href="/khach-hang/don-hang" class="nav-link">Đơn hàng</a>
+            </nav>
+
+            <div class="header-actions"
+                style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 15px !important;">
+                <!-- User Profile -->
+                <div class="user-dropdown" id="userMenu">
+                    <div class="header-action-item" onclick="toggleDropdown(event)">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <div th:if="${session.username == null}">
+                            <a href="/dang-nhap" class="dropdown-item">Đăng nhập</a>
+                        </div>
+                        <div th:if="${session.username != null}">
+                            <div class="dropdown-item"
+                                style="color: var(--text-secondary); border-bottom: 1px solid var(--border-color); cursor: default; font-weight: 600;">
+                                <span th:text="${'Xin chào, ' + session.username}">User</span>
+                            </div>
+                            <a href="/dang-nhap" class="dropdown-item"
+                                style="color: var(--accent-color); font-weight: 600;">Đăng xuất</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function toggleDropdown(event) {
+                event.stopPropagation();
+                const menu = document.getElementById('dropdownMenu');
+                menu.classList.toggle('show');
+            }
+
+            // Close dropdown when clicking anywhere else
+            document.addEventListener('click', function (event) {
+                const menu = document.getElementById('dropdownMenu');
+                const userMenu = document.getElementById('userMenu');
+                if (menu && menu.classList.contains('show') && !userMenu.contains(event.target)) {
+                    menu.classList.remove('show');
+                }
+            });
+        </script>
+    </header>
+
+</body>
+
+</html>

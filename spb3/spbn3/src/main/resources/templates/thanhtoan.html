@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán | Clothing Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 900px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .payment-qr {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px dashed var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .payment-qr img {
+            width: 200px;
+            height: 200px;
+            margin: 15px 0;
+        }
+
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-sm);
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container section-padding">
+        <h2 style="font-size: 32px; margin-bottom: 40px;">Thanh toán đơn hàng</h2>
+
+        <div class="checkout-container">
+            <!-- LEFT: Shipping Info -->
+            <div class="form-section">
+                <h3 style="margin-bottom: 25px;">Thông tin giao hàng</h3>
+                <form th:action="@{/khach-hang/don-hang/place}" method="post">
+                    <div class="form-group">
+                        <label>Họ và tên người nhận</label>
+                        <input type="text" name="tenNhan" class="form-control" placeholder="Nguyễn Văn A" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input type="tel" name="sdt" class="form-control" placeholder="0987xxxxxx" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Địa chỉ nhận hàng</label>
+                        <textarea name="diaChi" class="form-control" rows="3"
+                            placeholder="Số nhà, tên đường, phường/xã..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Ghi chú (nếu có)</label>
+                        <textarea name="ghiChu" class="form-control" rows="2"
+                            placeholder="Ví dụ: Giao vào giờ hành chính..."></textarea>
+                    </div>
+
+                    <input type="hidden" name="tongTien"
+                        th:value="${tongTien != null ? (tongTien >= 500000 ? tongTien : tongTien + 30000) : 0}">
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px; margin-top: 20px;">
+                        Xác nhận đặt hàng
+                    </button>
+                </form>
+            </div>
+
+            <!-- RIGHT: Order Summary & Payment -->
+            <aside>
+                <div class="form-section" style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 20px; font-size: 18px;">Tóm tắt đơn hàng</h3>
+
+                    <!-- Single Item (Buy Now) -->
+                    <div th:if="${item != null}"
+                        style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
+                        <img th:src="@{'/images/' + ${item.hinhAnh}}"
+                            style="width: 60px; height: 75px; object-fit: cover; border-radius: 8px;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px;" th:text="${item.ten}">Product</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);"
+                                th:text="${size + ' | ' + mau + ' x ' + soLuong}">Size</div>
+                        </div>
+                    </div>
+
+                    <!-- Cart Items -->
+                    <div th:if="${isCart}" th:each="gh : ${gioHang}"
+                        style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
+                        <th:block th:if="${gh.sanPham != null}">
+                            <img th:src="@{'/images/' + ${gh.sanPham.hinhAnh}}"
+                                style="width: 50px; height: 65px; object-fit: cover; border-radius: 8px;">
+                            <div>
+                                <div style="font-weight: 600; font-size: 13px;" th:text="${gh.sanPham.ten}">Product
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-secondary);"
+                                    th:text="${gh.size + ' | ' + gh.mau + ' x ' + gh.soLuong}">Size</div>
+                            </div>
+                        </th:block>
+                        <th:block th:unless="${gh.sanPham != null}">
+                            <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=800"
+                                style="width: 50px; height: 65px; object-fit: cover; border-radius: 8px;">
+                            <div>
+                                <div style="font-weight: 600; font-size: 13px; color: var(--text-secondary);">Sản phẩm
+                                    đã bị xóa</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);"
+                                    th:text="${gh.size + ' | ' + gh.mau + ' x ' + gh.soLuong}">Size</div>
+                            </div>
+                        </th:block>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Tổng tiền hàng</span>
+                            <span
+                                th:text="${#numbers.formatDecimal(tongTien != null ? tongTien : #aggregates.sum(gioHang.![thanhTien]), 0, 'COMMA', 0, 'POINT') + ' đ'}">0
+                                đ</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Phí vận chuyển</span>
+                            <span style="color: #2ed573;">Miễn phí</span>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; font-weight: 700; font-size: 20px; margin-top: 20px; color: var(--accent-color);">
+                            <span>Thanh toán</span>
+                            <span
+                                th:text="${#numbers.formatDecimal(tongTien >= 500000 ? tongTien : tongTien + 30000, 0, 'COMMA', 0, 'POINT') + ' đ'}">0
+                                đ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-qr">
+                    <h4 style="margin-bottom: 10px;">Thanh toán qua chuyển khoản</h4>
+                    <p style="font-size: 12px; color: var(--text-secondary);">Quét mã QR dưới đây để thanh toán</p>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=CHUYEN_KHOAN_DON_HANG"
+                        alt="QR Code">
+                    <div style="font-size: 13px; font-weight: 600;">STK: 123456789 - MB Bank</div>
+                    <div style="font-size: 12px;">Chủ TK: NGUYEN VAN A</div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${sp.ten + ' | Clothing Shop'}">Chi tiết sản phẩm</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .product-detail-flex {
+            display: flex;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 900px) {
+            .product-detail-flex {
+                flex-direction: column;
+            }
+
+            .product-image-large {
+                width: 100% !important;
+            }
+        }
+
+        .product-image-large {
+            width: 50%;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .product-image-large img {
+            width: 100%;
+            display: block;
+        }
+
+        .product-meta-details {
+            flex: 1;
+        }
+
+        .availability-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(46, 213, 115, 0.1);
+            color: #2ed573;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container section-padding">
+        <div class="product-detail-flex">
+
+            <!-- LARGE PRODUCT IMAGE -->
+            <div class="product-image-large">
+                <img th:src="@{'/images/' + ${sp.hinhAnh}}" class="product-image"
+                    onerror="this.src='https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=1200'">
+            </div>
+
+            <!-- PRODUCT INFO SIDE -->
+            <div class="product-meta-details">
+                <div class="availability-badge" th:if="${sp.soLuong > 0}">Sẵn sàng giao ngay</div>
+
+                <h1 style="font-size: 36px; margin-bottom: 10px;" th:text="${sp.ten}">Product Title</h1>
+                <div class="product-price" style="font-size: 28px; margin-bottom: 25px;"
+                    th:text="${#numbers.formatDecimal(sp.gia, 0, 'COMMA', 0, 'POINT') + ' đ'}">0 đ</div>
+
+                <div style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid var(--border-color);">
+                    <h4 style="margin-bottom: 10px; font-weight: 600;">Mô tả sản phẩm</h4>
+                    <p style="color: var(--text-secondary);" th:text="${sp.moTa}">Đây là mô tả chi tiết của sản phẩm.
+                        Một bộ trang phục hoàn hảo cho mọi dịp.</p>
+                </div>
+
+                <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+                    <input type="hidden" name="sanPhamId" th:value="${sp.id}">
+
+                    <div style="display: flex; gap: 20px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label style="font-size: 13px; color: var(--text-secondary);">Chọn kích thước</label>
+                            <select name="size" class="form-control" style="margin-top: 5px;">
+                                <option>S</option>
+                                <option selected>M</option>
+                                <option>L</option>
+                                <option>XL</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="flex: 1;">
+                            <label style="font-size: 13px; color: var(--text-secondary);">Chọn màu sắc</label>
+                            <select name="mau" class="form-control" style="margin-top: 5px;">
+                                <option>Đen</option>
+                                <option>Trắng</option>
+                                <option>Navy</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="width: 100px;">
+                        <label style="font-size: 13px; color: var(--text-secondary);">Số lượng</label>
+                        <input type="number" name="soLuong" value="1" min="1" class="form-control"
+                            style="margin-top: 5px;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                        <button class="btn btn-primary" formaction="/khach-hang/gio-hang/them" style="padding: 18px;">
+                            🛒 Thêm vào giỏ hàng
+                        </button>
+                        <button class="btn btn-accent" formaction="/khach-hang/thanh-toan/mua-ngay"
+                            style="padding: 18px;">
+                            ⚡ Mua hàng ngay
+                        </button>
+                    </div>
+                </form>
+
+                <div
+                    style="margin-top: 40px; background: #fff; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
+                        <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 50%;">🚚</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px;">Giao hàng nhanh chóng</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Miễn phí vận chuyển cho đơn hàng
+                                từ 500k</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 50%;">🔄</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px;">Chính sách đổi trả</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Đổi trả miễn phí trong vòng 7
+                                ngày</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        function showToast(message, type = 'success') {
+            console.log('SHOWING TOAST:', message);
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+
+            const icon = type === 'success' ? '✅' : '❌';
+
+            toast.innerHTML = `
+                <span class="toast-icon">${icon}</span>
+                <span class="toast-message">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            // Force reflow
+            toast.offsetHeight;
+
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (container.contains(toast)) {
+                        container.removeChild(toast);
+                    }
+                }, 400);
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Kiểm tra URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === 'true') {
+                showToast('Thêm vào giỏ hàng thành công!');
+                // Xóa parameter khỏi URL mà không load lại trang
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            const cartForm = document.querySelector('form');
+            // Tìm nút theo text hoặc thuộc tính formaction (dùng ends-with để an toàn hơn)
+            const btnAddToCart = document.querySelector('button[formaction*="/khach-hang/gio-hang/them"]');
+
+            console.log('Cart form found:', !!cartForm);
+            console.log('Add to cart button found:', !!btnAddToCart);
+
+            if (btnAddToCart) {
+                btnAddToCart.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log('Add to cart clicked');
+
+                    const formData = new FormData(cartForm);
+
+                    fetch('/khach-hang/gio-hang/them', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                        .then(response => {
+                            console.log('Fetch response status:', response.status);
+                            if (response.ok) {
+                                showToast('Thêm vào giỏ hàng thành công!');
+                            } else {
+                                // Nếu AJAX lỗi, fallback bằng cách submit form thông thường
+                                console.warn('AJAX failed, falling back to normal submit');
+                                cartForm.action = btnAddToCart.getAttribute('formaction');
+                                cartForm.submit();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch error:', error);
+                            // Fallback
+                            cartForm.action = btnAddToCart.getAttribute('formaction');
+                            cartForm.submit();
+                        });
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

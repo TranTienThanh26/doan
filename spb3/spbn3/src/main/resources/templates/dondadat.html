@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng của tôi | Clothing Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .order-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .order-table th {
+            text-align: left;
+            padding: 15px 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .order-row {
+            background: white;
+            box-shadow: var(--shadow-sm);
+            border-radius: 12px;
+        }
+
+        .order-row td {
+            padding: 20px;
+        }
+
+        .order-row td:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .order-row td:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(255, 176, 0, 0.1);
+            color: #ffa502;
+        }
+
+        .status-confirmed {
+            background: rgba(46, 213, 115, 0.1);
+            color: #2ed573;
+        }
+
+        .status-cancelled {
+            background: rgba(255, 71, 87, 0.1);
+            color: #ff4757;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container section-padding">
+        <h2 style="font-size: 32px; margin-bottom: 40px;">📦 Lịch sử đơn hàng</h2>
+
+        <div th:if="${#lists.isEmpty(donhangs)}" style="text-align: center; padding: 60px 0;">
+            <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
+            <h3 style="margin-bottom: 10px;">Bạn chưa có đơn hàng nào</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 30px;">Hãy bắt đầu mua sắm để làm mới tủ đồ của mình
+                nhé!</p>
+            <a href="/khach-hang/san-pham" class="btn btn-primary">Khám phá sản phẩm</a>
+        </div>
+
+        <table class="order-table" th:if="${!#lists.isEmpty(donhangs)}">
+            <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng đơn</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="order-row" th:each="dh : ${donhangs}">
+                    <td style="font-weight: 600;" th:text="'#' + ${dh.id}"></td>
+                    <td th:text="${#temporals.format(dh.ngayDat, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${#numbers.formatDecimal(dh.tongTien, 0, 'COMMA', 0, 'POINT') + ' đ'}"
+                        style="font-weight: 600; color: var(--accent-color);"></td>
+                    <td>
+                        <span
+                            th:class="'status-badge ' + ${dh.trangThai == 'Chờ xác nhận' ? 'status-pending' : (dh.trangThai == 'Đã xác nhận' ? 'status-confirmed' : 'status-cancelled')}"
+                            th:text="${dh.trangThai}"></span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <a th:href="@{/khach-hang/don-hang/{id}(id=${dh.id})}"
+                                style="color: var(--primary-color); font-weight: 600; font-size: 14px; text-decoration: none;">
+                                👀 Chi tiết
+                            </a>
+                            <a th:if="${dh.trangThai == 'Chờ xác nhận'}"
+                                th:href="@{/khach-hang/don-hang/huy/{id}(id=${dh.id})}"
+                                style="color: var(--accent-color); font-weight: 600; font-size: 14px;">
+                                Hủy đơn
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="margin-top: 40px;">
+            <a href="/khach-hang/san-pham"
+                style="color: var(--text-primary); font-weight: 500; display: flex; align-items: center; gap: 10px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Quay lại cửa hàng
+            </a>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+
+</html>

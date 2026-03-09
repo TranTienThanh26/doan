@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Khách hàng | Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/admin_sidebar :: admin-sidebar(currentPage='customers')}"></div>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1 class="admin-title">👤 Quản lý Khách hàng</h1>
+            <div th:text="${dsKhachHang.size() + ' khách hàng'}"
+                style="font-size: 14px; color: #6c757d; font-weight: 500;"></div>
+        </header>
+
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; align-items: start;">
+
+            <!-- Customer List -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3 style="margin: 0; font-size: 16px;">Danh sách tài khoản</h3>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Khách hàng</th>
+                            <th>Liên hệ</th>
+                            <th>Địa chỉ</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="kh : ${dsKhachHang}">
+                            <td>
+                                <div style="font-weight: 600;" th:text="${kh.tenKhachHang}"></div>
+                                <div style="font-size: 11px; color: #6c757d;" th:text="'#' + ${kh.id}"></div>
+                            </td>
+                            <td>
+                                <div th:text="${kh.email}" style="font-size: 13px;"></div>
+                                <div th:text="${kh.soDienThoai}" style="font-size: 12px; color: #6c757d;"></div>
+                            </td>
+                            <td th:text="${kh.diaChi}" style="font-size: 13px;"></td>
+                            <td>
+                                <div style="display: flex; gap: 10px;">
+                                    <a th:href="@{/khach-hang/sua/{id}(id=${kh.id})}" title="Sửa"
+                                        style="color: var(--admin-primary); text-decoration: none;">✏️</a>
+                                    <a th:href="@{/khach-hang/xoa/{id}(id=${kh.id})}" title="Xóa"
+                                        style="color: var(--admin-danger); text-decoration: none;"
+                                        onclick="return confirm('Xác nhận xóa khách hàng này?')">🗑️</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(dsKhachHang)}">
+                            <td colspan="4" style="text-align: center; padding: 40px; color: #6c757d;">Chưa có khách
+                                hàng nào.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Form -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3 style="margin: 0; font-size: 16px;"
+                        th:text="${khachHang.id == 0 ? '➕ Thêm khách hàng' : '✏️ Cập nhật khách hàng'}"></h3>
+                </div>
+                <div style="padding: 25px;">
+                    <form th:action="${khachHang.id == 0 ? '/khach-hang/them' : '/khach-hang/sua'}"
+                        th:object="${khachHang}" method="post">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="admin-form-group">
+                            <label class="admin-label">Tên khách hàng *</label>
+                            <input type="text" th:field="*{tenKhachHang}" class="admin-input" required
+                                placeholder="Họ và tên...">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label class="admin-label">Số điện thoại *</label>
+                            <input type="text" th:field="*{soDienThoai}" class="admin-input" required
+                                placeholder="090...">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label class="admin-label">Email *</label>
+                            <input type="email" th:field="*{email}" class="admin-input" required
+                                placeholder="example@gmail.com">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label class="admin-label">Địa chỉ</label>
+                            <textarea th:field="*{diaChi}" class="admin-input" style="height: 80px; resize: none;"
+                                placeholder="Địa chỉ giao hàng..."></textarea>
+                        </div>
+
+                        <div style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button type="submit" class="btn-admin btn-admin-primary"
+                                style="flex: 1; justify-content: center;">Lưu lại</button>
+                            <a href="/khach-hang" class="btn-admin btn-admin-outline"
+                                style="flex: 1; justify-content: center;">Làm mới</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

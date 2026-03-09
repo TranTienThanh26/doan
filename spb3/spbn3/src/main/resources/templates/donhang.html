@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Đơn hàng | Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .status-btn {
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-approve {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .btn-approve:hover {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .btn-reject {
+            background: #fee2e2;
+            color: #d32f2f;
+        }
+
+        .btn-reject:hover {
+            background: #d32f2f;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/admin_sidebar :: admin-sidebar(currentPage='orders')}"></div>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1 class="admin-title">🧾 Quản lý Đơn hàng</h1>
+            <div th:text="${donhangs != null ? donhangs.size() + ' đơn hàng tổng cộng' : '0 đơn hàng'}"
+                style="font-size: 14px; color: #6c757d; font-weight: 500;"></div>
+        </header>
+
+        <div class="admin-card">
+            <div class="card-header">
+                <h3 style="margin: 0; font-size: 16px;">Tất cả đơn hàng</h3>
+            </div>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Mã Đơn</th>
+                        <th>Khách Hàng</th>
+                        <th>Ngày Đặt</th>
+                        <th>Số Điện Thoại</th>
+                        <th>Tổng Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="dh : ${donhangs}">
+                        <td th:text="'#' + ${dh.id}" style="font-weight: 600;"></td>
+                        <td>
+                            <div th:text="${dh.tenNhan}" style="font-weight: 600;"></div>
+                            <div th:text="${dh.diaChi}" style="font-size: 11px; color: #6c757d;"></div>
+                        </td>
+                        <td th:text="${#temporals.format(dh.ngayDat, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${dh.sdt}"></td>
+                        <td th:text="${#numbers.formatDecimal(dh.tongTien, 0, 'COMMA', 0, 'POINT') + ' đ'}"
+                            style="font-weight: 700; color: var(--admin-primary);"></td>
+                        <td>
+                            <span
+                                th:class="'badge ' + ${dh.trangThai == 'Đã xác nhận' ? 'badge-success' : (dh.trangThai == 'Đã hủy' ? 'badge-danger' : 'badge-pending')}"
+                                th:text="${dh.trangThai}"></span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <!-- Form cập nhật trạng thái nhanh -->
+                                <form th:if="${dh.trangThai == 'Chờ xác nhận' || dh.trangThai == 'Chờ xử lý'}"
+                                    th:action="@{/admin/don-hang/update-status}" method="post" style="display: inline;">
+                                    <input type="hidden" name="id" th:value="${dh.id}">
+                                    <input type="hidden" name="trangThai" value="Đã xác nhận">
+                                    <button type="submit" class="status-btn btn-approve">Duyệt</button>
+                                </form>
+                                <form th:if="${dh.trangThai == 'Chờ xác nhận' || dh.trangThai == 'Chờ xử lý'}"
+                                    th:action="@{/admin/don-hang/update-status}" method="post" style="display: inline;">
+                                    <input type="hidden" name="id" th:value="${dh.id}">
+                                    <input type="hidden" name="trangThai" value="Đã hủy">
+                                    <button type="submit" class="status-btn btn-reject">Hủy</button>
+                                </form>
+                                <a th:href="@{/admin/don-hang/{id}(id=${dh.id})}"
+                                    style="text-decoration: none; font-size: 11px; font-weight: 700; border-radius: 6px; padding: 5px 10px; background: #f0f0f0; color: #333;">
+                                    Chi tiết
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(donhangs)}">
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #6c757d;">Không tìm thấy đơn
+                            hàng nào.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+</body>
+
+</html>
